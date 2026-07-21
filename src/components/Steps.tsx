@@ -19,7 +19,7 @@ export const Step1: React.FC<StepProps> = ({ data, updateData, errors }) => (
     />
     <div className="space-y-6">
       <div>
-        <Label>Birthday Person's Name *</Label>
+        <Label>Birthday Person's Name</Label>
         <Input
           placeholder="Who is celebrating their birthday?"
           value={data.name}
@@ -29,7 +29,7 @@ export const Step1: React.FC<StepProps> = ({ data, updateData, errors }) => (
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <Label>Date of Birthday *</Label>
+          <Label>Date of Birthday</Label>
           <Input
             type="date"
             value={data.date}
@@ -39,7 +39,7 @@ export const Step1: React.FC<StepProps> = ({ data, updateData, errors }) => (
           />
         </div>
         <div>
-          <Label>Secret PIN (4 Digits) *</Label>
+          <Label>Secret PIN (4 Digits)</Label>
           <Input
             type="password"
             maxLength={4}
@@ -202,7 +202,7 @@ export const Step5: React.FC<StepProps> = ({ data, updateData, errors }) => (
     />
     <div className="space-y-6">
       <div>
-        <Label>Intro Title *</Label>
+        <Label>Intro Title</Label>
         <Input
           placeholder="Welcome back, sunshine ☀️"
           value={data.introTitle}
@@ -211,7 +211,7 @@ export const Step5: React.FC<StepProps> = ({ data, updateData, errors }) => (
         />
       </div>
       <div>
-        <Label>Intro Subtitle *</Label>
+        <Label>Intro Subtitle</Label>
         <Input
           placeholder="A little something made just for you"
           value={data.introSubtitle}
@@ -266,7 +266,7 @@ export const Step6: React.FC<StepProps> = ({ data, updateData, errors }) => {
       
       <div className="space-y-6">
         <div>
-          <Label>Audio URL (Link) *</Label>
+          <Label>Audio URL (Link)</Label>
           <Input
             placeholder="https://... (direct link to mp3/wav/ogg)"
             value={data.customSongUrl}
@@ -635,7 +635,7 @@ export const Step10: React.FC<StepProps> = ({ data, updateData, errors }) => {
       />
       <div className="space-y-6">
         <div>
-          <Label>Title *</Label>
+          <Label>Title</Label>
           <Input
             placeholder=""
             value={data.surpriseTitle}
@@ -652,7 +652,7 @@ export const Step10: React.FC<StepProps> = ({ data, updateData, errors }) => {
           />
         </div>
         <div>
-          <Label>Image URL *</Label>
+          <Label>Image URL</Label>
           <Input
             placeholder=""
             value={data.surpriseImageUrl}
@@ -701,7 +701,7 @@ export const Step11: React.FC<StepProps> = ({ data, updateData, errors }) => (
     />
     <div className="space-y-6">
       <div>
-        <Label>Greeting *</Label>
+        <Label>Greeting</Label>
         <Input
           placeholder="My dearest,"
           value={data.letterGreeting}
@@ -710,7 +710,7 @@ export const Step11: React.FC<StepProps> = ({ data, updateData, errors }) => (
         />
       </div>
       <div>
-        <Label>Body (One paragraph per line) *</Label>
+        <Label>Body (One paragraph per line)</Label>
         <TextArea
           rows={6}
           placeholder="Today, I just wanted to say..."
@@ -720,7 +720,7 @@ export const Step11: React.FC<StepProps> = ({ data, updateData, errors }) => (
         />
       </div>
       <div>
-        <Label>Sign-off *</Label>
+        <Label>Sign-off</Label>
         <Input
           placeholder="Forever yours, with all my heart ❤️"
           value={data.letterSignOff}

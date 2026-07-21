@@ -61,16 +61,3 @@ export const getFileUrl = async (idbUrl: string): Promise<string | null> => {
   if (!file) return null;
   return URL.createObjectURL(file);
 };
-
-export const getFileBase64 = async (idbUrl: string): Promise<string | null> => {
-  if (!idbUrl.startsWith('idb://')) return idbUrl;
-  const id = idbUrl.replace('idb://', '');
-  const file = await getFile(id);
-  if (!file) return null;
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-};

@@ -10,6 +10,111 @@ import { Confetti } from './Confetti';
 
 import { playPopSound } from '../lib/sounds';
 
+const BalloonWishes: React.FC<{ wishes: string[]; onNext: () => void; onPrev: () => void }> = ({ wishes, onNext, onPrev }) => {
+  const validWishes = wishes.filter(w => w.trim() !== '');
+  const [popped, setPopped] = useState<boolean[]>(new Array(validWishes.length).fill(false));
+
+  const handlePop = (index: number) => {
+    if (!popped[index]) {
+      playPopSound();
+      const newPopped = [...popped];
+      newPopped[index] = true;
+      setPopped(newPopped);
+    }
+  };
+
+  const allPopped = validWishes.length > 0 ? popped.every(Boolean) : true;
+
+  const balloonColors = [
+    'from-red-400 to-rose-600',
+    'from-blue-400 to-indigo-600',
+    'from-green-400 to-emerald-600',
+    'from-yellow-400 to-amber-600',
+    'from-purple-400 to-fuchsia-600'
+  ];
+
+  return (
+    <motion.div 
+      key="step4"
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="flex flex-col items-center justify-center min-h-screen z-10 w-full max-w-3xl mx-auto px-4 space-y-8"
+    >
+      <h2 className="text-4xl font-serif text-white text-center">Wishes for You</h2>
+      
+      {!allPopped && validWishes.length > 0 && (
+        <p className="text-white/70 animate-pulse text-center">Pop the balloons to reveal your wishes!</p>
+      )}
+
+      {validWishes.length > 0 ? (
+        <div className="flex flex-wrap justify-center gap-6 w-full min-h-[160px]">
+          {validWishes.map((wish, i) => {
+            if (popped[i]) return null;
+            return (
+              <motion.div
+                key={`balloon-${i}`}
+                animate={{ 
+                  y: [0, -15, 0], 
+                  rotate: [-2, 2, -2] 
+                }}
+                transition={{ 
+                  repeat: Infinity, 
+                  duration: 3 + (i % 3), 
+                  ease: "easeInOut" 
+                }}
+                onClick={() => handlePop(i)}
+                className={`relative cursor-pointer w-20 h-28 md:w-24 md:h-32 rounded-[50%_50%_50%_50%/40%_40%_60%_60%] bg-gradient-to-br ${balloonColors[i % balloonColors.length]} shadow-2xl flex items-center justify-center group`}
+              >
+                <div className="absolute top-2 left-2 w-4 h-8 bg-white/30 rounded-full blur-[2px] transform -rotate-45" />
+                <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-1 h-8 bg-white/20" />
+              </motion.div>
+            );
+          })}
+        </div>
+      ) : (
+        <p className="text-white/50 text-center">No wishes added.</p>
+      )}
+
+      <div className="grid gap-4 w-full">
+        <AnimatePresence>
+          {validWishes.map((wish, i) => {
+            if (!popped[i]) return null;
+            return (
+              <motion.div 
+                key={`wish-${i}`}
+                initial={{ opacity: 0, scale: 0.5, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ type: "spring", bounce: 0.5 }}
+                className="p-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 flex items-start gap-4"
+              >
+                <Star className="w-6 h-6 text-pink-400 shrink-0 mt-1" />
+                <p className="text-lg text-white/90">{wish}</p>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+      </div>
+
+      <div className="flex items-center justify-center gap-4 mt-8 w-full">
+        <button onClick={onPrev} className="px-6 py-3 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold flex items-center gap-2">
+          <ChevronLeft className="w-5 h-5" /> Back
+        </button>
+        <AnimatePresence>
+          {allPopped && (
+            <motion.button 
+              initial={{ opacity: 0, width: 0 }}
+              animate={{ opacity: 1, width: 'auto' }}
+              onClick={onNext} 
+              className="px-8 py-3 rounded-full bg-pink-600 hover:bg-pink-500 text-white font-bold flex items-center gap-2 whitespace-nowrap overflow-hidden"
+            >
+              Next <ChevronRight className="w-5 h-5" />
+            </motion.button>
+          )}
+        </AnimatePresence>
+      </div>
+    </motion.div>
+  );
+};
+
 export const GiftPreview: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -29,27 +134,15 @@ export const GiftPreview: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [showConfetti, setShowConfetti] = useState(false);
 
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [enteredPin, setEnteredPin] = useState('');
+  const [pinError, setPinError] = useState(false);
+
   useEffect(() => {
     const loadData = async () => {
       try {
         if (!id) return;
-        
-        let stored = null;
-        
-        try {
-          const res = await fetch(`/api/gifts/${id}`);
-          if (res.ok) {
-            stored = await res.json();
-          }
-        } catch (e) {
-          console.error('Failed to fetch from API, falling back to local DB', e);
-        }
-
-        // Fallback to local DB if not found in API
-        if (!stored) {
-          stored = await get(`gift-${id}`);
-        }
-
+        const stored = await get(`gift-${id}`);
         if (stored) {
           setData(stored);
           
@@ -138,11 +231,54 @@ export const GiftPreview: React.FC = () => {
         <GalaxyBackground />
         <h1 className="text-2xl font-serif text-pink-400 relative z-10">Gift not found</h1>
         <p className="text-white/50 max-w-sm relative z-10">
-          The gift could not be found. Make sure the link is correct or the gift hasn't been deleted.
+          Since there is no cloud database configured yet, gifts are only saved locally in your browser.
         </p>
         <button onClick={() => navigate('/')} className="mt-8 px-6 py-2 bg-white/10 rounded-full hover:bg-white/20 transition-colors z-10">
           Create a new gift
         </button>
+      </div>
+    );
+  }
+
+  if (data.pin && !isUnlocked) {
+    return (
+      <div className="min-h-screen bg-transparent text-white flex flex-col items-center justify-center p-6 text-center space-y-6 overflow-hidden relative">
+        <GalaxyBackground />
+        <div className="z-10 bg-white/10 p-8 rounded-3xl backdrop-blur-md border border-white/20 w-full max-w-sm flex flex-col items-center space-y-6">
+          <div className="w-16 h-16 bg-pink-500/20 rounded-full flex items-center justify-center">
+             <Star className="w-8 h-8 text-pink-400" />
+          </div>
+          <h2 className="text-2xl font-serif text-white">Unlock Your Gift</h2>
+          <p className="text-white/70 text-sm">Enter the secret PIN to open this gift.</p>
+          
+          <input 
+            type="password"
+            maxLength={4}
+            value={enteredPin}
+            onChange={(e) => {
+              setEnteredPin(e.target.value);
+              setPinError(false);
+            }}
+            className={`w-full bg-black/30 border ${pinError ? 'border-red-500' : 'border-white/20'} rounded-xl px-4 py-3 text-center text-2xl tracking-widest text-white outline-none focus:border-pink-500`}
+            placeholder="****"
+          />
+          
+          {pinError && <p className="text-red-400 text-sm">Incorrect PIN, try again.</p>}
+          {data.pinHint && <p className="text-pink-300 text-sm italic">Hint: {data.pinHint}</p>}
+
+          <button 
+            onClick={() => {
+              if (enteredPin === data.pin) {
+                setIsUnlocked(true);
+              } else {
+                setPinError(true);
+              }
+            }}
+            className="w-full bg-pink-600 hover:bg-pink-500 text-white font-bold py-3 rounded-xl transition-colors"
+          >
+            Unlock
+          </button>
+        </div>
       </div>
     );
   }
@@ -323,35 +459,12 @@ export const GiftPreview: React.FC = () => {
 
       case 4:
         return (
-          <motion.div 
+          <BalloonWishes 
             key="step4"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="flex flex-col items-center justify-center min-h-screen z-10 w-full max-w-3xl mx-auto px-4 space-y-8"
-          >
-            <h2 className="text-4xl font-serif text-white text-center">Wishes for You</h2>
-            <div className="grid gap-4 w-full">
-              {data.wishes.map((wish, i) => (
-                <motion.div 
-                  key={i}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.2 }}
-                  className="p-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 flex items-start gap-4"
-                >
-                  <Star className="w-6 h-6 text-pink-400 shrink-0 mt-1" />
-                  <p className="text-lg text-white/90">{wish}</p>
-                </motion.div>
-              ))}
-            </div>
-            <div className="flex items-center gap-4 mt-8">
-              <button onClick={() => goToStep(3)} className="px-6 py-3 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold flex items-center gap-2">
-                <ChevronLeft className="w-5 h-5" /> Back
-              </button>
-              <button onClick={() => goToStep(5)} className="px-8 py-3 rounded-full bg-pink-600 hover:bg-pink-500 text-white font-bold flex items-center gap-2">
-                Next <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
-          </motion.div>
+            wishes={data.wishes} 
+            onNext={() => goToStep(5)} 
+            onPrev={() => goToStep(3)} 
+          />
         );
 
       case 5:

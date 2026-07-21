@@ -53,31 +53,9 @@ export default function App() {
   };
 
   const validateStep = (step: number): boolean => {
-    const newErrors: Record<string, string> = {};
-    let isValid = true;
-
-    if (step === 1) {
-      if (!data.name.trim()) { newErrors.name = 'Required'; isValid = false; }
-      if (!data.date) { newErrors.date = 'Required'; isValid = false; }
-      if (!data.pin.trim()) { newErrors.pin = 'Required'; isValid = false; }
-    } else if (step === 5) {
-      if (!data.introTitle.trim()) { newErrors.introTitle = 'Required'; isValid = false; }
-      if (!data.introSubtitle.trim()) { newErrors.introSubtitle = 'Required'; isValid = false; }
-    } else if (step === 6) {
-      if (data.song === 'custom' && !data.customSongUrl.trim()) { newErrors.customSongUrl = 'Required'; isValid = false; }
-    } else if (step === 7) {
-      if (data.memories.length === 0) { newErrors.memories = 'Required'; isValid = false; }
-    } else if (step === 10) {
-      if (!data.surpriseTitle.trim()) { newErrors.surpriseTitle = 'Required'; isValid = false; }
-      if (!data.surpriseImageUrl.trim()) { newErrors.surpriseImageUrl = 'Required'; isValid = false; }
-    } else if (step === 11) {
-      if (!data.letterGreeting.trim()) { newErrors.letterGreeting = 'Required'; isValid = false; }
-      if (!data.letterBody.trim()) { newErrors.letterBody = 'Required'; isValid = false; }
-      if (!data.letterSignOff.trim()) { newErrors.letterSignOff = 'Required'; isValid = false; }
-    }
-
-    setErrors(newErrors);
-    return isValid;
+    // Made optional as per user request
+    setErrors({});
+    return true;
   };
 
   const handleNext = () => {
@@ -102,47 +80,10 @@ export default function App() {
     if (!validateStep(currentStep)) return;
     playPopSound();
     const newId = Date.now().toString(36);
-    
-    try {
-      // Process data: Convert idb:// to base64
-      const { getFileBase64 } = await import('./lib/db');
-      const processedData = { ...data };
-      
-      const processUrl = async (url: string) => {
-        if (url && url.startsWith('idb://')) {
-          const b64 = await getFileBase64(url);
-          return b64 || url;
-        }
-        return url;
-      };
-
-      processedData.customSongUrl = await processUrl(processedData.customSongUrl);
-      processedData.gameImageUrl = await processUrl(processedData.gameImageUrl);
-      processedData.surpriseImageUrl = await processUrl(processedData.surpriseImageUrl);
-      
-      const newMemories = [];
-      for (const m of processedData.memories) {
-        newMemories.push(await processUrl(m));
-      }
-      processedData.memories = newMemories;
-
-      const res = await fetch('/api/gifts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: newId, data: processedData })
-      });
-      
-      if (!res.ok) throw new Error('Failed to save gift');
-
-      // Still save locally just in case
-      await set(`gift-${newId}`, processedData);
-      await del(DRAFT_KEY);
-      setShareId(newId);
-      setIsCompleted(true);
-    } catch (err) {
-      console.error(err);
-      alert('Failed to create gift. Please try again.');
-    }
+    await set(`gift-${newId}`, data);
+    await del(DRAFT_KEY);
+    setShareId(newId);
+    setIsCompleted(true);
   };
 
   const progress = Math.round((currentStep / TOTAL_STEPS) * 100);
@@ -207,15 +148,6 @@ export default function App() {
               <Eye className="w-4 h-4" /> Preview
             </button>
           </div>
-          <div className="flex gap-4 pt-2">
-            <a 
-              href="/api/db/download"
-              download="gifts.sqlite"
-              className="flex-1 flex items-center justify-center gap-2 py-2 rounded-full bg-white/5 hover:bg-white/10 text-white/70 text-sm transition-colors border border-white/10"
-            >
-              Download Database File (SQL)
-            </a>
-          </div>
         </motion.div>
       </div>
     );
@@ -234,7 +166,7 @@ export default function App() {
         </button>
         <div className="flex-1 max-w-md mx-auto hidden md:block">
            <div className="text-center text-xs font-mono tracking-widest text-white/40 bg-white/5 py-2 rounded-full border border-white/5">
-             TEGIFTWEBSITE.COM
+             GIFT CREATOR
            </div>
         </div>
         <div className="w-20 hidden md:block" /> {/* Spacer */}
