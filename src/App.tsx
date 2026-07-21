@@ -80,10 +80,69 @@ export default function App() {
     if (!validateStep(currentStep)) return;
     playPopSound();
     const newId = Date.now().toString(36);
-    await set(`gift-${newId}`, data);
-    await del(DRAFT_KEY);
-    setShareId(newId);
-    setIsCompleted(true);
+    
+    try {
+      const { getFileBlob } = await import('./lib/db');
+      const { supabase } = await import('./lib/supabase');
+      const processedData = { ...data };
+      
+      const processUrl = async (url: string, pathPrefix: string) => {
+        if (url && url.startsWith('idb://')) {
+          const blob = await getFileBlob(url);
+          if (blob) {
+            // Give it a file extension based on type
+            const ext = blob.type.split('/')[1] || 'bin';
+            const fileName = `${newId}/${pathPrefix}_${Date.now()}.${ext}`;
+            
+            // Upload to Supabase Storage
+            const { data: uploadData, error: uploadError } = await supabase.storage
+              .from('gift-assets')
+              .upload(fileName, blob);
+              
+            if (uploadError) {
+              console.error('Failed to upload file:', uploadError);
+              throw uploadError;
+            }
+            
+            // Get Public URL
+            const { data: publicUrlData } = supabase.storage
+              .from('gift-assets')
+              .getPublicUrl(fileName);
+              
+            return publicUrlData.publicUrl;
+          }
+        }
+        return url;
+      };
+
+      processedData.customSongUrl = await processUrl(processedData.customSongUrl, 'song');
+      processedData.gameImageUrl = await processUrl(processedData.gameImageUrl, 'game');
+      processedData.surpriseImageUrl = await processUrl(processedData.surpriseImageUrl, 'surprise');
+      
+      const newMemories = [];
+      let memoryIndex = 0;
+      for (const m of processedData.memories) {
+        newMemories.push(await processUrl(m, `memory_${memoryIndex++}`));
+      }
+      processedData.memories = newMemories;
+
+      // Upload to Supabase database
+      const { error } = await supabase.from('gifts').insert([{ id: newId, data: processedData }]);
+      
+      if (error) {
+        console.error('Supabase Error:', error);
+        throw new Error('Failed to save gift to Supabase');
+      }
+
+      // Still save locally just in case
+      await set(`gift-${newId}`, processedData);
+      await del(DRAFT_KEY);
+      setShareId(newId);
+      setIsCompleted(true);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to create gift. Please check your Supabase connection and ensure the gift-assets bucket exists and is public.');
+    }
   };
 
   const progress = Math.round((currentStep / TOTAL_STEPS) * 100);

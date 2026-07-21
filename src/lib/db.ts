@@ -61,3 +61,10 @@ export const getFileUrl = async (idbUrl: string): Promise<string | null> => {
   if (!file) return null;
   return URL.createObjectURL(file);
 };
+
+export const getFileBlob = async (idbUrl: string): Promise<File | Blob | null> => {
+  if (!idbUrl.startsWith('idb://')) return null;
+  const id = idbUrl.replace('idb://', '');
+  const file = await getFile(id);
+  return file || null;
+};

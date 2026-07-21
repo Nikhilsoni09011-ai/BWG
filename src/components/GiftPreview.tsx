@@ -142,7 +142,31 @@ export const GiftPreview: React.FC = () => {
     const loadData = async () => {
       try {
         if (!id) return;
-        const stored = await get(`gift-${id}`);
+        
+        let stored = null;
+        
+        try {
+          const { supabase } = await import('../lib/supabase');
+          const { data: supaData, error } = await supabase
+            .from('gifts')
+            .select('data')
+            .eq('id', id)
+            .single();
+            
+          if (supaData && !error) {
+            stored = supaData.data;
+          } else {
+            console.warn('Supabase fetch returned error or no data', error);
+          }
+        } catch (e) {
+          console.error('Failed to fetch from Supabase, falling back to local DB', e);
+        }
+
+        // Fallback to local DB if not found in API
+        if (!stored) {
+          stored = await get(`gift-${id}`);
+        }
+
         if (stored) {
           setData(stored);
           
@@ -231,7 +255,7 @@ export const GiftPreview: React.FC = () => {
         <GalaxyBackground />
         <h1 className="text-2xl font-serif text-pink-400 relative z-10">Gift not found</h1>
         <p className="text-white/50 max-w-sm relative z-10">
-          Since there is no cloud database configured yet, gifts are only saved locally in your browser.
+          The gift could not be found. Make sure the link is correct or the gift hasn't been deleted.
         </p>
         <button onClick={() => navigate('/')} className="mt-8 px-6 py-2 bg-white/10 rounded-full hover:bg-white/20 transition-colors z-10">
           Create a new gift
