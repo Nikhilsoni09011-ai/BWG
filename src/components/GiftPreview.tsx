@@ -134,9 +134,9 @@ export const GiftPreview: React.FC = () => {
   const getGiftWrapStyles = (id: string) => {
     switch (id) {
         case 'classic-pink': return { icon: '🎁', gradient: 'from-pink-500 to-rose-600', shadow: 'shadow-[0_0_40px_rgba(236,72,153,0.5)]', hoverShadow: 'hover:shadow-[0_0_60px_rgba(236,72,153,0.8)]', emojiShadow: 'drop-shadow-[0_0_20px_rgba(236,72,153,0.5)]' };
-        case 'royal-gold': return { icon: '🎁', gradient: 'from-blue-900 to-indigo-950', shadow: 'shadow-[0_0_40px_rgba(30,58,138,0.5)]', hoverShadow: 'hover:shadow-[0_0_60px_rgba(30,58,138,0.8)]', border: 'border-yellow-500/50', emojiShadow: 'drop-shadow-[0_0_20px_rgba(234,179,8,0.5)]' };
-        case 'mint-silver': return { icon: '🎁', gradient: 'from-teal-300 to-emerald-400', shadow: 'shadow-[0_0_40px_rgba(45,212,191,0.5)]', hoverShadow: 'hover:shadow-[0_0_60px_rgba(45,212,191,0.8)]', emojiShadow: 'drop-shadow-[0_0_20px_rgba(255,255,255,0.5)]' };
-        case 'rainbow-pop': return { icon: '🎁', gradient: 'from-purple-500 via-pink-500 to-yellow-500', shadow: 'shadow-[0_0_40px_rgba(236,72,153,0.5)]', hoverShadow: 'hover:shadow-[0_0_60px_rgba(236,72,153,0.8)]', emojiShadow: 'drop-shadow-[0_0_20px_rgba(236,72,153,0.5)]' };
+        case 'royal-gold': return { icon: '👑', gradient: 'from-blue-900 to-indigo-950', shadow: 'shadow-[0_0_40px_rgba(30,58,138,0.5)]', hoverShadow: 'hover:shadow-[0_0_60px_rgba(30,58,138,0.8)]', border: 'border-yellow-500/50', emojiShadow: 'drop-shadow-[0_0_20px_rgba(234,179,8,0.5)]' };
+        case 'mint-silver': return { icon: '💎', gradient: 'from-teal-300 to-emerald-400', shadow: 'shadow-[0_0_40px_rgba(45,212,191,0.5)]', hoverShadow: 'hover:shadow-[0_0_60px_rgba(45,212,191,0.8)]', emojiShadow: 'drop-shadow-[0_0_20px_rgba(255,255,255,0.5)]' };
+        case 'rainbow-pop': return { icon: '🌈', gradient: 'from-purple-500 via-pink-500 to-yellow-500', shadow: 'shadow-[0_0_40px_rgba(236,72,153,0.5)]', hoverShadow: 'hover:shadow-[0_0_60px_rgba(236,72,153,0.8)]', emojiShadow: 'drop-shadow-[0_0_20px_rgba(236,72,153,0.5)]' };
         case 'love-letter': return { icon: '💌', gradient: 'from-red-100 to-rose-200', shadow: 'shadow-[0_0_40px_rgba(254,205,211,0.5)]', hoverShadow: 'hover:shadow-[0_0_60px_rgba(254,205,211,0.8)]', emojiShadow: 'drop-shadow-[0_0_20px_rgba(225,29,72,0.5)]' };
         default: return { icon: '🎁', gradient: 'from-pink-600 to-purple-600', shadow: 'shadow-[0_0_40px_rgba(236,72,153,0.5)]', hoverShadow: 'hover:shadow-[0_0_60px_rgba(236,72,153,0.8)]', emojiShadow: 'drop-shadow-[0_0_20px_rgba(236,72,153,0.5)]' };
     }

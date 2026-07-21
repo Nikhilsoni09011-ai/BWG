@@ -104,9 +104,9 @@ export const Step2: React.FC<StepProps> = ({ data, updateData }) => {
 export const Step3: React.FC<StepProps> = ({ data, updateData }) => {
   const wraps = [
     { id: 'classic-pink', title: 'Classic Pink', desc: 'Pink box, gold bow', icon: '🎁', gradient: 'from-pink-500 to-rose-600', shadow: 'shadow-pink-500/50' },
-    { id: 'royal-gold', title: 'Royal Gold', desc: 'Navy box, gold ribbon', icon: '🎁', gradient: 'from-blue-900 to-indigo-950', shadow: 'shadow-blue-900/50', border: 'border-yellow-500/50' },
-    { id: 'mint-silver', title: 'Mint & Silver', desc: 'Soft mint green box', icon: '🎁', gradient: 'from-teal-300 to-emerald-400', shadow: 'shadow-teal-400/50', text: 'text-teal-950' },
-    { id: 'rainbow-pop', title: 'Rainbow Pop', desc: 'Bright colors', icon: '🎁', gradient: 'from-purple-500 via-pink-500 to-yellow-500', shadow: 'shadow-pink-500/50' },
+    { id: 'royal-gold', title: 'Royal Gold', desc: 'Navy box, gold ribbon', icon: '👑', gradient: 'from-blue-900 to-indigo-950', shadow: 'shadow-blue-900/50', border: 'border-yellow-500/50' },
+    { id: 'mint-silver', title: 'Mint & Silver', desc: 'Soft mint green box', icon: '💎', gradient: 'from-teal-300 to-emerald-400', shadow: 'shadow-teal-400/50', text: 'text-teal-950' },
+    { id: 'rainbow-pop', title: 'Rainbow Pop', desc: 'Bright colors', icon: '🌈', gradient: 'from-purple-500 via-pink-500 to-yellow-500', shadow: 'shadow-pink-500/50' },
     { id: 'love-letter', title: 'Love Letter', desc: 'Classic envelope', icon: '💌', gradient: 'from-red-100 to-rose-200', shadow: 'shadow-red-200/50', text: 'text-red-900' },
   ];
 

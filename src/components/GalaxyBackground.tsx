@@ -13,6 +13,10 @@ export const GalaxyBackground = ({ theme = 'midnight' }: { theme?: string }) => 
       xMove: Math.random() * 150 - 75,
       yMove: Math.random() * 150 - 75,
       colorIndex: Math.random() > 0.5 ? 0 : 1, // 0 or 1 for the two theme colors
+      isEmoji: Math.random() > 0.7, // 30% chance to be an emoji
+      emojiIndex: Math.floor(Math.random() * 5), // index for the emoji array
+      rotateStart: Math.random() * 360,
+      rotateEnd: Math.random() * 360 + 180 * (Math.random() > 0.5 ? 1 : -1)
     }));
   }, []);
 
@@ -22,6 +26,7 @@ export const GalaxyBackground = ({ theme = 'midnight' }: { theme?: string }) => 
         return {
           bg: 'bg-[#1a0a05]',
           particles: ['#fbbf24', '#f43f5e'],
+          emojis: ['🎉', '🎈', '🎂', '🎁', '🥳'],
           gradient1: 'rgba(251, 191, 36, 0.08)',
           gradient2: 'rgba(244, 63, 94, 0.08)'
         };
@@ -29,6 +34,7 @@ export const GalaxyBackground = ({ theme = 'midnight' }: { theme?: string }) => 
         return {
           bg: 'bg-[#05051a]',
           particles: ['#8b5cf6', '#a78bfa'],
+          emojis: ['🌌', '⭐', '🪐', '🚀', '☄️'],
           gradient1: 'rgba(139, 92, 246, 0.08)',
           gradient2: 'rgba(167, 139, 250, 0.08)'
         };
@@ -36,6 +42,7 @@ export const GalaxyBackground = ({ theme = 'midnight' }: { theme?: string }) => 
         return {
           bg: 'bg-[#051a1a]',
           particles: ['#2dd4bf', '#14b8a6'],
+          emojis: ['💎', '☘️', '🌿', '🐢', '✨'],
           gradient1: 'rgba(45, 212, 191, 0.08)',
           gradient2: 'rgba(20, 184, 166, 0.08)'
         };
@@ -43,6 +50,7 @@ export const GalaxyBackground = ({ theme = 'midnight' }: { theme?: string }) => 
         return {
           bg: 'bg-[#05111a]',
           particles: ['#38bdf8', '#e2e8f0'],
+          emojis: ['❄️', '⛄', '🧊', '🏔️', '✨'],
           gradient1: 'rgba(56, 189, 248, 0.08)',
           gradient2: 'rgba(226, 232, 240, 0.08)'
         };
@@ -50,6 +58,7 @@ export const GalaxyBackground = ({ theme = 'midnight' }: { theme?: string }) => 
         return {
           bg: 'bg-[#1a0515]',
           particles: ['#f472b6', '#34d399'],
+          emojis: ['🎊', '🎈', '🕺', '💃', '🥂'],
           gradient1: 'rgba(244, 114, 182, 0.08)',
           gradient2: 'rgba(52, 211, 153, 0.08)'
         };
@@ -57,6 +66,7 @@ export const GalaxyBackground = ({ theme = 'midnight' }: { theme?: string }) => 
         return {
           bg: 'bg-[#1a050b]',
           particles: ['#fda4af', '#f43f5e'],
+          emojis: ['💖', '💗', '💓', '💞', '💕'],
           gradient1: 'rgba(253, 164, 175, 0.08)',
           gradient2: 'rgba(244, 63, 94, 0.08)'
         };
@@ -64,6 +74,7 @@ export const GalaxyBackground = ({ theme = 'midnight' }: { theme?: string }) => 
         return {
           bg: 'bg-[#0a051a]',
           particles: ['#e879f9', '#22d3ee'],
+          emojis: ['💜', '💙', '💚', '💛', '💖'],
           gradient1: 'rgba(232, 121, 249, 0.08)',
           gradient2: 'rgba(34, 211, 238, 0.08)'
         };
@@ -71,6 +82,7 @@ export const GalaxyBackground = ({ theme = 'midnight' }: { theme?: string }) => 
         return {
           bg: 'bg-[#1a0f05]',
           particles: ['#fde047', '#fda4af'],
+          emojis: ['✨', '💖', '💝', '🌟', '💕'],
           gradient1: 'rgba(253, 224, 71, 0.08)',
           gradient2: 'rgba(253, 164, 175, 0.08)'
         };
@@ -78,6 +90,7 @@ export const GalaxyBackground = ({ theme = 'midnight' }: { theme?: string }) => 
         return {
           bg: 'bg-[#1a0505]',
           particles: ['#ef4444', '#f87171'],
+          emojis: ['💕', '💑', '💌', '❤️', '💖'],
           gradient1: 'rgba(239, 68, 68, 0.08)',
           gradient2: 'rgba(248, 113, 113, 0.08)'
         };
@@ -86,6 +99,7 @@ export const GalaxyBackground = ({ theme = 'midnight' }: { theme?: string }) => 
         return {
           bg: 'bg-[#08030e]',
           particles: ['#f472b6', '#c084fc'],
+          emojis: ['🌙', '✨', '🦉', '🌟', '🌌'],
           gradient1: 'rgba(236, 72, 153, 0.08)',
           gradient2: 'rgba(139, 92, 246, 0.08)'
         };
@@ -95,8 +109,8 @@ export const GalaxyBackground = ({ theme = 'midnight' }: { theme?: string }) => 
   return (
     <div className={`fixed inset-0 pointer-events-none z-0 overflow-hidden ${themeColors.bg} transition-colors duration-1000`}>
       {/* Base gradient glows */}
-      <div className="absolute inset-0 opacity-40 mix-blend-screen transition-all duration-1000" 
-           style={{
+      <div className="absolute inset-0 opacity-40 mix-blend-screen transition-all duration-1000"
+            style={{ 
              backgroundImage: `radial-gradient(circle at 30% 30%, ${themeColors.gradient1} 0%, transparent 50%), radial-gradient(circle at 70% 70%, ${themeColors.gradient2} 0%, transparent 50%)`
            }}>
       </div>
@@ -104,6 +118,37 @@ export const GalaxyBackground = ({ theme = 'midnight' }: { theme?: string }) => 
       {/* Drifting galaxy particles */}
       {particles.map((p) => {
         const pColor = themeColors.particles[p.colorIndex];
+        
+        if (p.isEmoji) {
+          const emoji = themeColors.emojis[p.emojiIndex % themeColors.emojis.length];
+          return (
+            <motion.div
+              key={p.id}
+              className="absolute"
+              style={{
+                left: `${p.x}vw`,
+                top: `${p.y}vh`,
+                fontSize: `${p.size * 15 + 30}px`,
+                filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.3))',
+                opacity: 0.6
+              }}
+              animate={{
+                x: [0, p.xMove * 4, 0],
+                y: [0, p.yMove * 4, 0],
+                rotate: [p.rotateStart, p.rotateEnd, p.rotateStart],
+              }}
+              transition={{
+                duration: p.duration * 1.5,
+                delay: p.delay,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+            >
+              {emoji}
+            </motion.div>
+          );
+        }
+
         return (
           <motion.div
             key={p.id}
