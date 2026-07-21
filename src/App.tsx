@@ -102,10 +102,47 @@ export default function App() {
     if (!validateStep(currentStep)) return;
     playPopSound();
     const newId = Date.now().toString(36);
-    await set(`gift-${newId}`, data);
-    await del(DRAFT_KEY);
-    setShareId(newId);
-    setIsCompleted(true);
+    
+    try {
+      // Process data: Convert idb:// to base64
+      const { getFileBase64 } = await import('./lib/db');
+      const processedData = { ...data };
+      
+      const processUrl = async (url: string) => {
+        if (url && url.startsWith('idb://')) {
+          const b64 = await getFileBase64(url);
+          return b64 || url;
+        }
+        return url;
+      };
+
+      processedData.customSongUrl = await processUrl(processedData.customSongUrl);
+      processedData.gameImageUrl = await processUrl(processedData.gameImageUrl);
+      processedData.surpriseImageUrl = await processUrl(processedData.surpriseImageUrl);
+      
+      const newMemories = [];
+      for (const m of processedData.memories) {
+        newMemories.push(await processUrl(m));
+      }
+      processedData.memories = newMemories;
+
+      const res = await fetch('/api/gifts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: newId, data: processedData })
+      });
+      
+      if (!res.ok) throw new Error('Failed to save gift');
+
+      // Still save locally just in case
+      await set(`gift-${newId}`, processedData);
+      await del(DRAFT_KEY);
+      setShareId(newId);
+      setIsCompleted(true);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to create gift. Please try again.');
+    }
   };
 
   const progress = Math.round((currentStep / TOTAL_STEPS) * 100);
@@ -169,6 +206,15 @@ export default function App() {
             >
               <Eye className="w-4 h-4" /> Preview
             </button>
+          </div>
+          <div className="flex gap-4 pt-2">
+            <a 
+              href="/api/db/download"
+              download="gifts.sqlite"
+              className="flex-1 flex items-center justify-center gap-2 py-2 rounded-full bg-white/5 hover:bg-white/10 text-white/70 text-sm transition-colors border border-white/10"
+            >
+              Download Database File (SQL)
+            </a>
           </div>
         </motion.div>
       </div>
