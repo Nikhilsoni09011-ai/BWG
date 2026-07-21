@@ -1,0 +1,6 @@
+{
+  "name": "Birthday Wish Generator",
+  "description": "Create a personalized, interactive birthday experience with 11 customizable steps.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
